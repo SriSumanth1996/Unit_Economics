@@ -2,7 +2,7 @@ import streamlit as st
 import plotly.graph_objects as go
 
 # Page Config
-st.set_page_config(page_title="☕ My Cafe", layout="wide")
+st.set_page_config(page_title="☕ Super Cool Cafe Breakeven Tracker", layout="wide")
 
 # CSS for Styling
 st.markdown("""
@@ -58,11 +58,11 @@ st.markdown("""
 
 # Cafe Parameters
 items = {
-    "Latte": {"price": 0, "variable_cost": 50, "color": "#8B4513"},
-    "Americano": {"price": 0, "variable_cost": 40, "color": "#654321"},
-    "Cappuccino": {"price": 0, "variable_cost": 60, "color": "#D2691E"}
+    "Latte": {"price": 150, "variable_cost": 50, "color": "#8B4513"},
+    "Americano": {"price": 120, "variable_cost": 40, "color": "#654321"},
+    "Cappuccino": {"price": 180, "variable_cost": 60, "color": "#D2691E"}
 }
-fixed_costs = 7000  # Rent, salaries, etc.
+fixed_costs = 50000  # Rent, salaries, etc.
 
 # Session State Initialization
 if "state" not in st.session_state:
@@ -102,8 +102,8 @@ def create_breakeven_chart():
                 marker_color=items[item]["color"],
                 base=bottom,
                 text=f'₹{contribution:,}',
-                textposition='inside' if contribution > 7000 else 'outside',
-                textfont=dict(color='white' if contribution > 7000 else 'black')
+                textposition='inside' if contribution > 5000 else 'outside',
+                textfont=dict(color='white' if contribution > 5000 else 'black')
             ))
             bottom += contribution
     
@@ -186,7 +186,7 @@ def reset_all():
     st.session_state.state = {"Latte": 0, "Americano": 0, "Cappuccino": 0}
 
 # UI Layout
-st.markdown('<h1 class="main-header">☕ My Café 📊</h1>', unsafe_allow_html=True)
+st.markdown('<h1 class="main-header">☕ SUPER COOL CAFE BREAKEVEN TRACKER 📊</h1>', unsafe_allow_html=True)
 
 with st.container():
     col1, col2 = st.columns([1, 2])
@@ -198,6 +198,10 @@ with st.container():
                 price = st.slider(f"Set {item} Price (₹)", 50, 300, step=5,
                                   value=items[item]["price"], key=f"{item}_price")
                 items[item]["price"] = price
+                
+                # Show variable cost info
+                st.info(f"📊 Variable Cost: ₹{items[item]['variable_cost']} | Contribution per unit: ₹{price - items[item]['variable_cost']}")
+                
                 col_btn1, col_btn2 = st.columns(2)
                 with col_btn1:
                     if st.button(f"🛒 Sell {item}", key=f"sell_{item}"):
