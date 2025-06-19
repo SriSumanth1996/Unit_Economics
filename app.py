@@ -186,7 +186,7 @@ def reset_all():
     st.session_state.state = {"Latte": 0, "Americano": 0, "Cappuccino": 0}
 
 # UI Layout
-st.markdown('<h1 class="main-header">☕ SUPER COOL CAFE BREAKEVEN TRACKER 📊</h1>', unsafe_allow_html=True)
+st.markdown('<h1 class="main-header">☕ My Café 📊</h1>', unsafe_allow_html=True)
 
 with st.container():
     col1, col2 = st.columns([1, 2])
