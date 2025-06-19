@@ -58,11 +58,11 @@ st.markdown("""
 
 # Cafe Parameters
 items = {
-    "Latte": {"price": 150, "variable_cost": 50, "color": "#8B4513"},
-    "Americano": {"price": 120, "variable_cost": 40, "color": "#654321"},
-    "Cappuccino": {"price": 180, "variable_cost": 60, "color": "#D2691E"}
+    "Latte": {"price": 0, "variable_cost": 50, "color": "#8B4513"},
+    "Americano": {"price": 0, "variable_cost": 40, "color": "#654321"},
+    "Cappuccino": {"price": 0, "variable_cost": 60, "color": "#D2691E"}
 }
-fixed_costs = 5000  # Rent, salaries, etc.
+fixed_costs = 7000  # Rent, salaries, etc.
 
 # Session State Initialization
 if "state" not in st.session_state:
@@ -102,8 +102,8 @@ def create_breakeven_chart():
                 marker_color=items[item]["color"],
                 base=bottom,
                 text=f'₹{contribution:,}',
-                textposition='inside' if contribution > 5000 else 'outside',
-                textfont=dict(color='white' if contribution > 5000 else 'black')
+                textposition='inside' if contribution > 7000 else 'outside',
+                textfont=dict(color='white' if contribution > 7000 else 'black')
             ))
             bottom += contribution
     
