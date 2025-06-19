@@ -207,15 +207,15 @@ with st.container():
                 with col_btn1:
                     if st.button(f"🛒 Sell {item}", key=f"sell_{item}"):
                         update_sales(item, "add")
-                        st.experimental_rerun()
+                        st.rerun()
                 with col_btn2:
                     if st.button(f"❌ Remove {item}", key=f"remove_{item}"):
                         update_sales(item, "remove")
-                        st.experimental_rerun()
+                        st.rerun()
 
         if st.button("🔄 RESET ALL", use_container_width=True):
             reset_all()
-            st.experimental_rerun()
+            st.rerun()
 
     with col2:
         st.subheader("📊 REAL-TIME ANALYTICS")
