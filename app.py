@@ -101,7 +101,7 @@ def update_sales(item, action):
 
 
 def create_charts():
-    sales_history = st.session_state.sales_history
+    """Create comprehensive analytics charts"""
     if not sales_history:
         fig = go.Figure()
         fig.add_annotation(
@@ -120,42 +120,44 @@ def create_charts():
         )
         return fig
 
+    # Create subplots
     fig = make_subplots(
         rows=2, cols=2,
-        subplot_titles=('📊 Sales by Item', '💰 Revenue Breakdown',
-                        '📈 Cumulative Profit', '🎯 Breakeven Progress'),
+        subplot_titles=('📊 Sales by Item', '💰 Revenue Breakdown', '📈 Cumulative Profit', '🎯 Breakeven Progress'),
         specs=[[{"type": "pie"}, {"type": "bar"}],
                [{"type": "xy"}, {"type": "indicator"}]],
         horizontal_spacing=0.15,
-        vertical_spacing=0.2
+        vertical_spacing=0.3
     )
 
-    # Pie Chart
-    sales_data = [st.session_state.state[item] for item in items.keys()]
+    # Pie Chart - Sales Distribution
+    sales_data = [state[item] for item in items.keys()]
     colors = [items[item]["color"] for item in items.keys()]
     if sum(sales_data) > 0:
         fig.add_trace(go.Pie(labels=list(items.keys()), values=sales_data,
                              marker_colors=colors, hole=0.4,
                              textinfo='label+percent+value'), row=1, col=1)
 
-    # Bar Chart
-    revenues = [st.session_state.state[item] * items[item]["price"] for item in items.keys()]
+    # Bar Chart - Revenue Breakdown
+    revenues = [state[item] * items[item]["price"] for item in items.keys()]
     fig.add_trace(go.Bar(x=list(items.keys()), y=revenues,
                          marker_color=colors,
                          text=[f"₹{rev}" for rev in revenues],
                          textposition='auto'), row=1, col=2)
 
-    # Cumulative Profit Line
+    # Line Chart - Cumulative Profit
     cumulative_profits = [entry['profit'] for entry in sales_history]
     fig.add_trace(go.Scatter(y=cumulative_profits, mode='lines+markers',
                              line=dict(color='#4CAF50', width=3),
                              marker=dict(size=8, color='#4CAF50'),
-                             fill='tozeroy' if any(p >= 0 for p in cumulative_profits) else None), row=2, col=1)
+                             fill='tozeroy' if any(p >= 0 for p in cumulative_profits) else None),
+                  row=2, col=1)
 
+    # ✅ Add Breakeven Line Here (Valid Axis Type)
     fig.add_hline(y=0, line_dash="dash", line_color="red",
                   annotation_text="Breakeven Line", row=2, col=1)
 
-    # Breakeven Indicator
+    # Indicator - Breakeven Progress
     current_profit = cumulative_profits[-1] if cumulative_profits else -fixed_costs
     breakeven_percentage = max(0, min(100, ((current_profit + fixed_costs) / fixed_costs) * 100))
     fig.add_trace(go.Indicator(
@@ -170,7 +172,8 @@ def create_charts():
             'steps': [{'range': [0, 50], 'color': "lightgray"},
                       {'range': [50, 100], 'color': "gray"}],
             'threshold': {'line': {'color': "red", 'width': 4}, 'value': 100}
-        }), row=2, col=2)
+        }
+    ), row=2, col=2)
 
     fig.update_layout(
         height=700,
@@ -181,9 +184,10 @@ def create_charts():
         title_font_size=16,
         margin=dict(l=50, r=50, t=80, b=50)
     )
-    fig.update_yaxes(title_text="Cumulative Profit (₹)", row=2, col=1)
-    return fig
 
+    fig.update_yaxes(title_text="Cumulative Profit (₹)", row=2, col=1)
+
+    return fig
 
 def reset_all():
     st.session_state.state = {"Latte": 0, "Americano": 0, "Cappuccino": 0}
