@@ -2,7 +2,7 @@ import streamlit as st
 import plotly.graph_objects as go
 
 # Page Config
-st.set_page_config(page_title="☕ My Cafe", layout="wide")
+st.set_page_config(page_title="☕ Super Cool Cafe Breakeven Tracker", layout="wide")
 
 # CSS for Styling
 st.markdown("""
@@ -58,9 +58,9 @@ st.markdown("""
 
 # Cafe Parameters
 items = {
-    "Latte": {"price": 0, "variable_cost": 50, "color": "#8B4513"},
-    "Americano": {"price": 0, "variable_cost": 40, "color": "#654321"},
-    "Cappuccino": {"price": 0, "variable_cost": 60, "color": "#D2691E"}
+    "Latte": {"price": 150, "variable_cost": 50, "color": "#8B4513"},
+    "Americano": {"price": 120, "variable_cost": 40, "color": "#654321"},
+    "Cappuccino": {"price": 180, "variable_cost": 60, "color": "#D2691E"}
 }
 fixed_costs = 7000  # Rent, salaries, etc.
 
@@ -225,7 +225,7 @@ with st.container():
         col_stats1, col_stats2 = st.columns(2)
         with col_stats1:
             st.markdown(f'<div class="metric-box">📦 Units Sold: <br>'
-                        f'{"".join([f"<br>☕ {item}: {count}" for item, count in state.items()])}</div>',
+                        f'{"".join([f"<br>☕ {item}: {count} × ₹{items[item]['price']} = ₹{count * items[item]['price']}" for item, count in state.items()])}</div>',
                         unsafe_allow_html=True)
             st.markdown(f'<div class="metric-box">💰 Total Revenue: ₹{revenue:,}</div>', unsafe_allow_html=True)
             st.markdown(f'<div class="metric-box">📦 Variable Cost: ₹{variable_cost:,}</div>', unsafe_allow_html=True)
