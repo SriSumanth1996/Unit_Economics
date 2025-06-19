@@ -62,7 +62,7 @@ items = {
     "Americano": {"price": 120, "variable_cost": 40, "color": "#654321"},
     "Cappuccino": {"price": 180, "variable_cost": 60, "color": "#D2691E"}
 }
-fixed_costs = 50000  # Rent, salaries, etc.
+fixed_costs = 5000  # Rent, salaries, etc.
 
 # Session State Initialization
 if "state" not in st.session_state:
