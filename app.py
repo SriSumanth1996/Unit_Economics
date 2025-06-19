@@ -200,7 +200,7 @@ with st.container():
                 items[item]["price"] = price
                 
                 # Show variable cost info
-                st.info(f"📊 Variable Cost: ₹{items[item]['variable_cost']}
+                st.info(f"📊 Variable Cost: ₹{items[item]['variable_cost']}")
                 
                 col_btn1, col_btn2 = st.columns(2)
                 with col_btn1:
