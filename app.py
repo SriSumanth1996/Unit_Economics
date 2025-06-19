@@ -102,6 +102,9 @@ def update_sales(item, action):
 
 def create_charts():
     """Create comprehensive analytics charts"""
+    sales_history = st.session_state.sales_history  # Fixed: Use session state
+    state = st.session_state.state  # Also ensure state is accessed from session
+
     if not sales_history:
         fig = go.Figure()
         fig.add_annotation(
@@ -153,7 +156,7 @@ def create_charts():
                              fill='tozeroy' if any(p >= 0 for p in cumulative_profits) else None),
                   row=2, col=1)
 
-    # ✅ Add Breakeven Line Here (Valid Axis Type)
+    # ✅ Add Breakeven Line
     fig.add_hline(y=0, line_dash="dash", line_color="red",
                   annotation_text="Breakeven Line", row=2, col=1)
 
