@@ -2,7 +2,7 @@ import streamlit as st
 import plotly.graph_objects as go
 
 # Page Config
-st.set_page_config(page_title="☕ Super Cool Cafe Breakeven Tracker", layout="wide")
+st.set_page_config(page_title="☕ My Cafe", layout="wide")
 
 # CSS for Styling
 st.markdown("""
