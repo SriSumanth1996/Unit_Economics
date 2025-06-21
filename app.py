@@ -198,17 +198,17 @@ with st.container():
                 # Show variable cost info
                 st.info(f"📊 Variable Cost: ₹{items[item]['variable_cost']}")
                 
-                # Quantity input
-                quantity = st.number_input(
-                    f"Enter {item} Quantity",
+                # Quantity slider
+                quantity = st.slider(
+                    f"Set {item} Quantity",
                     min_value=0,
+                    max_value=100,  # Reasonable max quantity
                     value=st.session_state.state[item],
                     step=1,
-                    key=f"quantity_{item}"
+                    key=f"quantity_{item}",
+                    on_change=update_sales,
+                    args=(item, st.session_state[f"quantity_{item}"])
                 )
-                if st.button("✅ Done", key=f"done_{item}"):
-                    update_sales(item, quantity)
-                    st.rerun()
 
         if st.button("🔄 RESET ALL", use_container_width=True):
             reset_all()
