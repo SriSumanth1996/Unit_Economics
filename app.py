@@ -69,21 +69,25 @@ if "state" not in st.session_state:
     st.session_state.state = {"Latte": 0, "Americano": 0, "Cappuccino": 0}
 
 # Helper Functions
+def update_sales(item):
+    quantity = st.session_state[f"quantity_{item}"]
+    st.session_state.state[item] = max(0, quantity)  # Ensure quantity is non-negative
+
 def create_breakeven_chart():
     """Create simple breakeven bar chart"""
     state = st.session_state.state
-    
+
     # Calculate contribution for each product
     contributions = {}
     for item in items:
         contribution_per_unit = items[item]["price"] - items[item]["variable_cost"]
         contributions[item] = state[item] * contribution_per_unit
-    
+
     total_contribution = sum(contributions.values())
-    
+
     # Create the chart
     fig = go.Figure()
-    
+
     # Add stacked bars for contributions from each product
     bottom = 0
     for item, contribution in contributions.items():
@@ -99,7 +103,7 @@ def create_breakeven_chart():
                 textfont=dict(color='white' if contribution > 7000 else 'black')
             ))
             bottom += contribution
-    
+
     # Add fixed costs bar
     fig.add_trace(go.Bar(
         x=['Fixed Costs'],
@@ -110,19 +114,19 @@ def create_breakeven_chart():
         textposition='inside',
         textfont=dict(color='white')
     ))
-    
+
     # Add breakeven line
     if total_contribution > 0:
         max_height = max(total_contribution, fixed_costs)
         fig.add_hline(
-            y=fixed_costs, 
-            line_dash="dash", 
-            line_color="red", 
+            y=fixed_costs,
+            line_dash="dash",
+            line_color="red",
             line_width=3,
             annotation_text="Breakeven Line",
             annotation_position="top right"
         )
-    
+
     # Update layout
     fig.update_layout(
         title={
@@ -146,7 +150,7 @@ def create_breakeven_chart():
             x=1
         )
     )
-    
+
     # Add annotations for better understanding
     if total_contribution >= fixed_costs:
         profit = total_contribution - fixed_costs
@@ -172,7 +176,7 @@ def create_breakeven_chart():
             bgcolor="lightyellow",
             bordercolor="orange"
         )
-    
+
     return fig
 
 def reset_all():
@@ -180,10 +184,8 @@ def reset_all():
 
 # UI Layout
 st.markdown('<h1 class="main-header">☕ My Café 📊</h1>', unsafe_allow_html=True)
-
 with st.container():
     col1, col2 = st.columns([1, 2])
-
     with col1:
         st.subheader("🎛️ CONTROL PANEL")
         for item in items:
@@ -191,34 +193,33 @@ with st.container():
                 price = st.slider(f"Set {item} Price (₹)", 50, 300, step=5,
                                   value=items[item]["price"], key=f"{item}_price")
                 items[item]["price"] = price
-                
+
                 # Show variable cost info
                 st.info(f"📊 Variable Cost: ₹{items[item]['variable_cost']}")
-                
+
                 # Quantity slider
-                st.session_state.state[item] = st.slider(
+                st.slider(
                     f"Set {item} Quantity",
                     min_value=0,
                     max_value=100,  # Reasonable max quantity
                     value=st.session_state.state[item],
                     step=1,
-                    key=f"quantity_{item}"
+                    key=f"quantity_{item}",
+                    on_change=update_sales,
+                    args=(item,)
                 )
-
         if st.button("🔄 RESET ALL", use_container_width=True):
             reset_all()
             st.rerun()
 
     with col2:
         st.subheader("📊 REAL-TIME ANALYTICS")
-
         state = st.session_state.state
         total_units = sum(state.values())
         revenue = sum(state[item] * items[item]["price"] for item in state)
         variable_cost = sum(state[item] * items[item]["variable_cost"] for item in state)
         contribution = revenue - variable_cost
         profit = contribution - fixed_costs
-
         col_stats1, col_stats2 = st.columns(2)
         with col_stats1:
             st.markdown(f'<div class="metric-box">📦 Units Sold: <br>'
@@ -230,13 +231,11 @@ with st.container():
             st.markdown(f'<div class="metric-box">📈 Contribution Margin: ₹{contribution:,}</div>', unsafe_allow_html=True)
             st.markdown(f'<div class="metric-box">🏢 Fixed Costs: ₹{fixed_costs:,}</div>', unsafe_allow_html=True)
             st.markdown(f'<div class="metric-box">💵 Net Profit: ₹{profit:,}</div>', unsafe_allow_html=True)
-
         if profit >= 0:
             st.markdown(f'<div class="profit-positive">🎉 BREAKEVEN ACHIEVED! Profit: ₹{profit:,}</div>', unsafe_allow_html=True)
         else:
             needed = abs(profit)
             st.markdown(f'<div class="profit-negative">📈 Need ₹{needed:,} more to breakeven</div>', unsafe_allow_html=True)
-
         st.markdown('<div class="chart-container">', unsafe_allow_html=True)
         st.plotly_chart(create_breakeven_chart(), use_container_width=True)
         st.markdown('</div>', unsafe_allow_html=True)
