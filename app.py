@@ -207,8 +207,11 @@ with st.container():
                     step=1,
                     key=f"quantity_{item}",
                     on_change=update_sales,
-                    args=(item, st.session_state[f"quantity_{item}"])
+                    args=(item, None)  # Placeholder for quantity, updated by Streamlit
                 )
+                # Update quantity directly when slider changes
+                if st.session_state[f"quantity_{item}"] != st.session_state.state[item]:
+                    update_sales(item, st.session_state[f"quantity_{item}"])
 
         if st.button("🔄 RESET ALL", use_container_width=True):
             reset_all()
