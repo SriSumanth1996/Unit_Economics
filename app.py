@@ -72,6 +72,7 @@ if "state" not in st.session_state:
 def update_sales(item):
     quantity = st.session_state[f"quantity_{item}"]
     st.session_state.state[item] = max(0, quantity)  # Ensure quantity is non-negative
+    st.rerun()  # Trigger re-render for real-time chart update
 
 def create_breakeven_chart():
     """Create simple breakeven bar chart"""
