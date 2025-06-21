@@ -69,12 +69,8 @@ if "state" not in st.session_state:
     st.session_state.state = {"Latte": 0, "Americano": 0, "Cappuccino": 0}
 
 # Helper Functions
-def update_sales(item, action):
-    state = st.session_state.state
-    if action == "add":
-        state[item] += 1
-    elif action == "remove" and state[item] > 0:
-        state[item] -= 1
+def update_sales(item, quantity):
+    st.session_state.state[item] = max(0, quantity)  # Ensure quantity is non-negative
 
 def create_breakeven_chart():
     """Create simple breakeven bar chart"""
@@ -202,15 +198,17 @@ with st.container():
                 # Show variable cost info
                 st.info(f"📊 Variable Cost: ₹{items[item]['variable_cost']}")
                 
-                col_btn1, col_btn2 = st.columns(2)
-                with col_btn1:
-                    if st.button(f"🛒 Sell {item}", key=f"sell_{item}"):
-                        update_sales(item, "add")
-                        st.rerun()
-                with col_btn2:
-                    if st.button(f"❌ Remove {item}", key=f"remove_{item}"):
-                        update_sales(item, "remove")
-                        st.rerun()
+                # Quantity input
+                quantity = st.number_input(
+                    f"Enter {item} Quantity",
+                    min_value=0,
+                    value=st.session_state.state[item],
+                    step=1,
+                    key=f"quantity_{item}"
+                )
+                if st.button("✅ Done", key=f"done_{item}"):
+                    update_sales(item, quantity)
+                    st.rerun()
 
         if st.button("🔄 RESET ALL", use_container_width=True):
             reset_all()
