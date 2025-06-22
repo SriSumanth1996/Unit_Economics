@@ -58,9 +58,9 @@ st.markdown("""
 
 # Cafe Parameters
 items = {
-    "Latte": {"price": 0, "variable_cost": 50, "color": "#8B4513"},
-    "Americano": {"price": 0, "variable_cost": 40, "color": "#654321"},
-    "Cappuccino": {"price": 0, "variable_cost": 60, "color": "#D2691E"}
+    "Latte": {"price": 100, "variable_cost": 50, "color": "#8B4513"},  # Set default price
+    "Americano": {"price": 90, "variable_cost": 40, "color": "#654321"},
+    "Cappuccino": {"price": 120, "variable_cost": 60, "color": "#D2691E"}
 }
 fixed_costs = 7000  # Rent, salaries, etc.
 
@@ -91,17 +91,18 @@ def create_breakeven_chart():
     # Add stacked bars for contributions from each product
     bottom = 0
     for item, contribution in contributions.items():
-        if contribution > 0:  # Only show items that have been sold
-            fig.add_trace(go.Bar(
-                x=['Total Contribution'],
-                y=[contribution],
-                name=f'{item} Contribution',
-                marker_color=items[item]["color"],
-                base=bottom,
-                text=f'₹{contribution:,}',
-                textposition='inside' if contribution > 7000 else 'outside',
-                textfont=dict(color='white' if contribution > 7000 else 'black')
-            ))
+        # Show all items, even with zero contribution, for visibility
+        fig.add_trace(go.Bar(
+            x=['Total Contribution'],
+            y=[max(0, contribution)],  # Use max to avoid negative bars
+            name=f'{item} Contribution',
+            marker_color=items[item]["color"],
+            base=bottom,
+            text=f'₹{contribution:,}' if contribution != 0 else '₹0',
+            textposition='inside' if contribution > 7000 else 'outside',
+            textfont=dict(color='white' if contribution > 7000 else 'black')
+        ))
+        if contribution > 0:
             bottom += contribution
     
     # Add fixed costs bar
@@ -203,7 +204,7 @@ with st.container():
                 st.slider(
                     f"Set {item} Quantity",
                     min_value=0,
-                    max_value=100,  # Reasonable max quantity
+                    max_value=100,
                     value=st.session_state.state[item],
                     step=1,
                     key=f"quantity_{item}",
