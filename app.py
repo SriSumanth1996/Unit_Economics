@@ -4,7 +4,7 @@ import plotly.graph_objects as go
 # Page Config
 st.set_page_config(page_title="☕ My Café", layout="wide")
 
-# CSS for Styling
+# CSS Styling
 st.markdown("""
     <style>
         * {
@@ -56,7 +56,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Cafe Parameters
+# Café Items & Fixed Costs
 items = {
     "Latte": {"price": 0, "variable_cost": 50, "color": "#8B4513"},
     "Americano": {"price": 0, "variable_cost": 40, "color": "#654321"},
@@ -69,28 +69,27 @@ if "state" not in st.session_state:
     st.session_state.state = {"Latte": 0, "Americano": 0, "Cappuccino": 0}
 
 # Helper Functions
-def update_sales(item, quantity):
-    st.session_state.state[item] = max(0, quantity)  # Ensure quantity is non-negative
+def update_sales(item):
+    quantity = st.session_state[f"quantity_{item}"]
+    st.session_state.state[item] = max(0, quantity)  # Ensure non-negative
+
+def reset_all():
+    st.session_state.state = {"Latte": 0, "Americano": 0, "Cappuccino": 0}
+    st.rerun()
 
 def create_breakeven_chart():
-    """Create simple breakeven bar chart"""
     state = st.session_state.state
-    
-    # Calculate contribution for each product
     contributions = {}
     for item in items:
         contribution_per_unit = items[item]["price"] - items[item]["variable_cost"]
         contributions[item] = state[item] * contribution_per_unit
-    
     total_contribution = sum(contributions.values())
-    
-    # Create the chart
+
     fig = go.Figure()
-    
-    # Add stacked bars for contributions from each product
     bottom = 0
+
     for item, contribution in contributions.items():
-        if contribution > 0:  # Only show items that have been sold
+        if contribution > 0:
             fig.add_trace(go.Bar(
                 x=['Total Contribution'],
                 y=[contribution],
@@ -102,8 +101,7 @@ def create_breakeven_chart():
                 textfont=dict(color='white' if contribution > 7000 else 'black')
             ))
             bottom += contribution
-    
-    # Add fixed costs bar
+
     fig.add_trace(go.Bar(
         x=['Fixed Costs'],
         y=[fixed_costs],
@@ -113,20 +111,17 @@ def create_breakeven_chart():
         textposition='inside',
         textfont=dict(color='white')
     ))
-    
-    # Add breakeven line
+
     if total_contribution > 0:
-        max_height = max(total_contribution, fixed_costs)
         fig.add_hline(
-            y=fixed_costs, 
-            line_dash="dash", 
-            line_color="red", 
+            y=fixed_costs,
+            line_dash="dash",
+            line_color="red",
             line_width=3,
             annotation_text="Breakeven Line",
             annotation_position="top right"
         )
-    
-    # Update layout
+
     fig.update_layout(
         title={
             'text': '🎯 Breakeven Analysis - Contribution vs Fixed Costs',
@@ -149,8 +144,7 @@ def create_breakeven_chart():
             x=1
         )
     )
-    
-    # Add annotations for better understanding
+
     if total_contribution >= fixed_costs:
         profit = total_contribution - fixed_costs
         fig.add_annotation(
@@ -175,11 +169,8 @@ def create_breakeven_chart():
             bgcolor="lightyellow",
             bordercolor="orange"
         )
-    
-    return fig
 
-def reset_all():
-    st.session_state.state = {"Latte": 0, "Americano": 0, "Cappuccino": 0}
+    return fig
 
 # UI Layout
 st.markdown('<h1 class="main-header">☕ My Café 📊</h1>', unsafe_allow_html=True)
@@ -191,33 +182,27 @@ with st.container():
         st.subheader("🎛️ CONTROL PANEL")
         for item in items:
             with st.expander(f"☕ {item}", expanded=True):
-                price = st.slider(f"Set {item} Price (₹)", 50, 300, step=5,
-                                  value=items[item]["price"], key=f"{item}_price")
+                price = st.slider(
+                    f"Set {item} Price (₹)", 50, 300, step=5,
+                    value=items[item]["price"], key=f"{item}_price"
+                )
                 items[item]["price"] = price
-                
-                # Show variable cost info
                 st.info(f"📊 Variable Cost: ₹{items[item]['variable_cost']}")
-                
-                # Quantity slider
-                quantity = st.slider(
+                st.slider(
                     f"Set {item} Quantity",
                     min_value=0,
-                    max_value=100,  # Reasonable max quantity
+                    max_value=100,
                     value=st.session_state.state[item],
                     step=1,
-                    key=f"quantity_{item}"
+                    key=f"quantity_{item}",
+                    on_change=update_sales,
+                    args=(item,)
                 )
-                if st.button("✅ Done", key=f"done_{item}"):
-                    update_sales(item, quantity)
-                    st.rerun()
-
         if st.button("🔄 RESET ALL", use_container_width=True):
             reset_all()
-            st.rerun()
 
     with col2:
         st.subheader("📊 REAL-TIME ANALYTICS")
-
         state = st.session_state.state
         total_units = sum(state.values())
         revenue = sum(state[item] * items[item]["price"] for item in state)
@@ -227,11 +212,14 @@ with st.container():
 
         col_stats1, col_stats2 = st.columns(2)
         with col_stats1:
-            st.markdown(f'<div class="metric-box">📦 Units Sold: <br>'
-                        f'{"".join([f"<br>☕ {item}: {count} × ₹{items[item]['price']} = ₹{count * items[item]['price']}" for item, count in state.items()])}</div>',
-                        unsafe_allow_html=True)
+            sales_details = "".join([
+                f"<br>☕ {item}: {count} × ₹{items[item]['price']} = ₹{count * items[item]['price']}"
+                for item, count in state.items()
+            ])
+            st.markdown(f'<div class="metric-box">📦 Units Sold: <br>{sales_details}</div>', unsafe_allow_html=True)
             st.markdown(f'<div class="metric-box">💰 Total Revenue: ₹{revenue:,}</div>', unsafe_allow_html=True)
             st.markdown(f'<div class="metric-box">📦 Variable Cost: ₹{variable_cost:,}</div>', unsafe_allow_html=True)
+
         with col_stats2:
             st.markdown(f'<div class="metric-box">📈 Contribution Margin: ₹{contribution:,}</div>', unsafe_allow_html=True)
             st.markdown(f'<div class="metric-box">🏢 Fixed Costs: ₹{fixed_costs:,}</div>', unsafe_allow_html=True)
