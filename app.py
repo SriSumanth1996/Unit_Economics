@@ -87,7 +87,7 @@ items = {
     "Americano": {"price": 90, "variable_cost": 40, "color": "#654321"},
     "Cappuccino": {"price": 120, "variable_cost": 60, "color": "#D2691E"}
 }
-fixed_costs = 7000  # Rent, salaries, etc.
+fixed_costs = 10000  # Rent, salaries, etc.
 
 # Session State Initialization
 if "state" not in st.session_state:
@@ -124,8 +124,8 @@ def create_breakeven_chart():
             marker_color=items[item]["color"],
             base=bottom,
             text=f'₹{contribution:,}' if contribution != 0 else '₹0',
-            textposition='inside' if contribution > 7000 else 'outside',
-            textfont=dict(color='white' if contribution > 7000 else 'black')
+            textposition='inside' if contribution > 10000 else 'outside',
+            textfont=dict(color='white' if contribution > 10000 else 'black')
         ))
         if contribution > 0:
             bottom += contribution
