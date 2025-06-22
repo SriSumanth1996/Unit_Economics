@@ -4,7 +4,7 @@ import plotly.graph_objects as go
 # Page Config
 st.set_page_config(page_title="☕ My Café", layout="wide")
 
-# CSS for Styling
+# CSS for Styling with Watermark
 st.markdown("""
     <style>
         * {
@@ -53,7 +53,32 @@ st.markdown("""
             padding: 20px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
+        .watermark {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 2rem;
+            color: rgba(0, 0, 0, 0.1);
+            pointer-events: none;
+            z-index: 0;
+            font-weight: bold;
+            text-align: center;
+        }
+        .footer-watermark {
+            position: fixed;
+            bottom: 10px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 0.9rem;
+            color: rgba(0, 0, 0, 0.5);
+            pointer-events: none;
+            z-index: 1000;
+        }
     </style>
+    <div class="watermark">Powered by BITSoM AI Center</div>
+    <div class="footer-watermark">© 2025 BITSoM AI Center. All rights reserved.</div>
 """, unsafe_allow_html=True)
 
 # Cafe Parameters
