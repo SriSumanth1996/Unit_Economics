@@ -69,8 +69,7 @@ if "state" not in st.session_state:
     st.session_state.state = {"Latte": 0, "Americano": 0, "Cappuccino": 0}
 
 # Helper Functions
-def update_sales(item):
-    quantity = st.session_state[f"quantity_{item}"]
+def update_sales(item, quantity):
     st.session_state.state[item] = max(0, quantity)  # Ensure quantity is non-negative
 
 def create_breakeven_chart():
@@ -200,16 +199,17 @@ with st.container():
                 st.info(f"📊 Variable Cost: ₹{items[item]['variable_cost']}")
                 
                 # Quantity slider
-                st.slider(
+                quantity = st.slider(
                     f"Set {item} Quantity",
                     min_value=0,
                     max_value=100,  # Reasonable max quantity
                     value=st.session_state.state[item],
                     step=1,
-                    key=f"quantity_{item}",
-                    on_change=update_sales,
-                    args=(item,)
+                    key=f"quantity_{item}"
                 )
+                if st.button("✅ Done", key=f"done_{item}"):
+                    update_sales(item, quantity)
+                    st.rerun()
 
         if st.button("🔄 RESET ALL", use_container_width=True):
             reset_all()
